@@ -2,12 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NewBehaviourScript : MonoBehaviour
+public class Scorer : MonoBehaviour
 {
     int hitCounter = 0;
-    void OnCollisionEnter()
+    private void OnCollisionEnter(Collision other)
     {
-        hitCounter++;
-        Debug.Log("You have hit a wall " + hitCounter + " times");
+        if(other.gameObject.tag != "Hit")
+        {
+            hitCounter++;
+            Debug.Log("You have hit a wall " + hitCounter + " times");
+        }
+        
     }
 }
