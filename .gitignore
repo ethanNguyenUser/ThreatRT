@@ -61,6 +61,14 @@ Temporary Items
 /Ethan Training/Training/[Ll]ogs/
 /Ethan Training/Training/[Uu]ser[Ss]ettings/
 
+ThreatRT Experiment/[Ll]ibrary/
+ThreatRT Experiment/[Tt]emp/
+ThreatRT Experiment/[Oo]bj/
+ThreatRT Experiment/[Bb]uild/
+ThreatRT Experiment/[Bb]uilds/
+ThreatRT Experiment/[Ll]ogs/
+ThreatRT Experiment/[Uu]ser[Ss]ettings/
+
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
 /[Mm]emoryCaptures/
