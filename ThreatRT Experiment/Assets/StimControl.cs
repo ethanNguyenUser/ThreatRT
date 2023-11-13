@@ -25,21 +25,32 @@ public class StimControl : MonoBehaviour
     // calculated for 10m distance from camera to deg0
     public string[] pos = { "deg0", "deg30", "deg-30" }; // different random positions available (Unity object names)
     public string[] ecc = { "0", "+30", "-30" }; // names to write to csv file, corresponding respectively to pos
-    public string[] stimuli = { "Face1", "Face2", "Face3" }; // names of different stimuli
+    public string[] stimuli = { "snake", "spider", "cube", "sphere", "apple", "banana" }; // names of different stimuli
 
     // self explanatory
     public string[] instrTextValues = {
     // instruction 1
-    @"You will be reacting to three different faces in this protocol, and
-        pressing the keys v, b, and n for each one. Please try to react to the
-        faces and don't try to anticipate them. Press Spacebar when ready.",
+    @"You will be reacting to six different stimuli in this protocol:
+        snake, spider, cube, sphere, apple, and banana. 
+        To react, you will be pressing the keys
+        v, for the snake and spider
+        b for the sphere and apple, and 
+        n for the apple and banana
+        Please try to react to the stimuli and don't try to anticipate them.
+        Press Spacebar when ready.",
     // instruction 2
-    @"This is Face 1. Press v to continue.",
+    @"This is a snake. Press v to continue.",
     // instruction 3
-    @"This is Face 2. Press b to continue.",
+    @"This is a spider. Press v to continue.",
     // instruction 4
-    @"This is Face 3. Press n to continue.",
+    @"This is a cube. Press b to continue.",
     // instruction 5
+    @"This is a sphere. Press b to continue.",
+    // instruction 6
+    @"This is an apple. Press n to continue.",
+    // instruction 7
+    @"This is a banana. Press n to continue.",
+    // instruction 8
     @"Here are some practice rounds to familiarize you with the protocol.
         Press Spacebar to begin.",
     };
@@ -311,7 +322,7 @@ public class StimControl : MonoBehaviour
         {
             phase0();
         }
-        else if(phase == 1) // in instructions / start phase
+        else if (phase == 1) // in instructions / start phase
         {
             phase1();
         }
