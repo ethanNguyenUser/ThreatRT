@@ -25,32 +25,28 @@ public class StimControl : MonoBehaviour
     // calculated for 10m distance from camera to deg0
     public string[] pos = { "deg0", "deg30", "deg-30" }; // different random positions available (Unity object names)
     public string[] ecc = { "0", "+30", "-30" }; // names to write to csv file, corresponding respectively to pos
-    public string[] stimuli = { "snake", "spider", "cube", "sphere", "apple", "banana" }; // names of different stimuli
+    public int[] delay = { -100, -50, -25, 0, 25, 50, 100 };
+    public string[] stimuli = { "snake", "spider", "apple", "banana"}; // names of different stimuli
 
     // self explanatory
     public string[] instrTextValues = {
     // instruction 1
-    @"You will be reacting to six different stimuli in this protocol:
-        snake, spider, cube, sphere, apple, and banana. 
+    @"You will be reacting to four different stimuli in this protocol:
+        snake, spider, apple, and banana. 
         To react, you will be pressing the keys
-        v, for the snake and spider
-        b for the sphere and apple, and 
-        n for the apple and banana
+        b, for the snake and spider 
+        n, for the apple and banana
         Please try to react to the stimuli and don't try to anticipate them.
         Press Spacebar when ready.",
     // instruction 2
-    @"This is a snake. Press v to continue.",
+    @"This is a snake. Press b to continue.",
     // instruction 3
-    @"This is a spider. Press v to continue.",
+    @"This is a spider. Press b to continue.",
     // instruction 4
-    @"This is a cube. Press b to continue.",
-    // instruction 5
-    @"This is a sphere. Press b to continue.",
-    // instruction 6
     @"This is an apple. Press n to continue.",
-    // instruction 7
+    // instruction 5
     @"This is a banana. Press n to continue.",
-    // instruction 8
+    // instruction 6
     @"Here are some practice rounds to familiarize you with the protocol.
         Press Spacebar to begin.",
     };
@@ -91,6 +87,7 @@ public class StimControl : MonoBehaviour
     private string responseKey = "";
     private string log; // new line of data
     private int instrNum = 0; // index used to increment instructions
+    private bool keyReleased = false;
     private int posIndex, stimIndex; // indices for pos and stimuli respectively randomized later in code (need global scope since they're used in multiple functions)
     public GameObject instrText; // text object for instructions
     public GameObject trainingText; // text object for training
@@ -137,6 +134,7 @@ public class StimControl : MonoBehaviour
             GameObject.Find("Canvas").transform.position = GameObject.Find("Disappear").transform.position; // canvas disappears
 
             phase = 1;
+            instrText.GetComponent<TextMeshPro>().text = instrTextValues[instrNum];
             instrText.transform.position = GameObject.Find("textPos").transform.position;
             return;
         }
@@ -148,29 +146,46 @@ public class StimControl : MonoBehaviour
         {
             instrNum++;
             instrText.GetComponent<TextMeshPro>().text = instrTextValues[instrNum];
-            GameObject.Find("Face1").transform.position = GameObject.Find("deg0").transform.position;
+            GameObject.Find("snake").transform.position = GameObject.Find("deg0").transform.position;
         }
-        if (Input.GetKeyDown(KeyCode.V) && instrNum == 1)
+        else if (Input.GetKeyDown(KeyCode.B) && instrNum == 1)
         {
             instrNum++;
             instrText.GetComponent<TextMeshPro>().text = instrTextValues[instrNum];
-            GameObject.Find("Face1").transform.position = GameObject.Find("Disappear").transform.position;
-            GameObject.Find("Face2").transform.position = GameObject.Find("deg0").transform.position;
+            GameObject.Find("snake").transform.position = GameObject.Find("Disappear").transform.position;
+            GameObject.Find("spider").transform.position = GameObject.Find("deg0").transform.position;
         }
-        if (Input.GetKeyDown(KeyCode.B) && instrNum == 2)
+        else if (instrNum == 1 && !Input.GetKeyDown(KeyCode.B)) //this is required or else we will skip instrNum == 2 case due to the user having already pressed B
+        {
+            keyReleased = true;
+        }
+        else if (Input.GetKeyDown(KeyCode.B) && instrNum == 2 && keyReleased)
         {
             instrNum++;
             instrText.GetComponent<TextMeshPro>().text = instrTextValues[instrNum];
-            GameObject.Find("Face2").transform.position = GameObject.Find("Disappear").transform.position;
-            GameObject.Find("Face3").transform.position = GameObject.Find("deg0").transform.position;
+            GameObject.Find("spider").transform.position = GameObject.Find("Disappear").transform.position;
+            GameObject.Find("apple").transform.position = GameObject.Find("deg0").transform.position;
+            keyReleased = false;
         }
-        if (Input.GetKeyDown(KeyCode.N) && instrNum == 3)
+        else if (Input.GetKeyDown(KeyCode.N) && instrNum == 3)
         {
             instrNum++;
             instrText.GetComponent<TextMeshPro>().text = instrTextValues[instrNum];
-            GameObject.Find("Face3").transform.position = GameObject.Find("Disappear").transform.position;
+            GameObject.Find("apple").transform.position = GameObject.Find("Disappear").transform.position;
+            GameObject.Find("banana").transform.position = GameObject.Find("deg0").transform.position;
         }
-        if (Input.GetKeyDown(KeyCode.Space) && instrNum == 4)
+        else if (instrNum == 3 && !Input.GetKeyDown(KeyCode.N))
+        {
+            keyReleased = true;
+        }
+        else if (Input.GetKeyDown(KeyCode.N) && instrNum == 4)
+        {
+            instrNum++;
+            instrText.GetComponent<TextMeshPro>().text = instrTextValues[instrNum];
+            GameObject.Find("banana").transform.position = GameObject.Find("Disappear").transform.position;
+            keyReleased = false;
+        }
+        else if (Input.GetKeyDown(KeyCode.Space) && instrNum == 5)
         {
             instrText.GetComponent<TextMeshPro>().text = instrTextValues[instrNum];
             instrText.transform.position = GameObject.Find("Disappear").transform.position;
