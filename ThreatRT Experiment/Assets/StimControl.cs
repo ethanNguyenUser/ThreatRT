@@ -66,7 +66,7 @@ public class StimControl : MonoBehaviour
     public int countdownTime = 5; // time between training and experiment phase
 
     // phase of experiment
-    public int phase = 2;
+    public int phase = 0;
     private bool in_use = false;    // avoid user clicking multiple buttons at same time
     private bool start = false;     // it's the first trial
     /*
@@ -311,10 +311,10 @@ public class StimControl : MonoBehaviour
 
     IEnumerator phase2() // training phase
     {
-        Debug.Log("over here");
         phase *= -1;
         while (currentTrial <= trainingTrials)
         {
+            Debug.Log("hi there");
             if (!in_use)
             {
                 in_use = true;
@@ -524,6 +524,7 @@ public class StimControl : MonoBehaviour
     //}
     void Start()
     {
+        phase = 2;
         instrText = GameObject.Find("instrText");
         trainingText = GameObject.Find("trainingText");
         nameInputField = GameObject.Find("nameInput").GetComponent<TMP_InputField>();
@@ -581,7 +582,6 @@ public class StimControl : MonoBehaviour
         }
         else if (phase == 0)
         {
-            Debug.Log("reached here");
             phase0(); // Name input phase
         }
         else if (phase == 1)
@@ -590,6 +590,7 @@ public class StimControl : MonoBehaviour
         }
         else if (phase == 2)
         {
+            Debug.Log("reached here");
             StartCoroutine(phase2()); // Training phase
         }
         else if (phase == 3)
