@@ -210,7 +210,7 @@ public class StimControl : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
         {
-            GameObject.Find("Canvas").transform.position = GameObject.Find("cuePos").transform.position; // canvas appears
+            //GameObject.Find("Canvas").transform.position = GameObject.Find("cuePos").transform.position; // canvas appears
             logFile = dataPath + nameInputField.text + "rtData-" + System.DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + ".csv";
             if (!Directory.Exists(dataPath))
             {
@@ -400,10 +400,30 @@ public class StimControl : MonoBehaviour
     }*/
 
     // Method to show a single stimulus for training
-    private void ShowSingleStimulusForTraining()
+     IEnumerator ShowSingleStimulusForTraining()
     {
         stimIndex = rnd.Next(stimuli.Length); // Randomly pick a stimulus
         GameObject.Find(stimuli[stimIndex]).transform.position = GameObject.Find("deg0").transform.position; // Show it at the center
+
+        currentTrial++;
+        yield return new WaitForSecondsRealtime(preCue_time); // wait before trial starts
+        GameObject.Find("Cue").transform.position = GameObject.Find("cuePos").transform.position; // Cue appears at center
+        yield return new WaitForSecondsRealtime(cue_time); // Cue stays there for this long
+
+        // randomizes stimulus every round
+        stimIndex = rnd.Next(0, stimuli.Length);
+
+        // wait time between cue and stimulus
+        cueToStim_time = (float)((rnd.NextDouble() * (time_max - time_min)) + time_min);
+
+        GameObject.Find("Cue").transform.position = GameObject.Find("Disappear").transform.position; // Cue disappears
+        // waits before showing stimulus
+        yield return new WaitForSecondsRealtime(cueToStim_time);
+
+        // shows stimulus
+        GameObject.Find(stimuli[stimIndex]).transform.position = GameObject.Find("deg0").transform.position; // StimType appears
+        start = true;
+        in_use = false;
     }
 
     // Method to handle training response and provide feedback
@@ -584,8 +604,8 @@ public class StimControl : MonoBehaviour
     //}
     void Start()
     {
-        phase = 2;
-        GameObject.Find("Canvas").transform.position = GameObject.Find("Disappear").transform.position; // canvas appears
+        //phase = 0;
+        //GameObject.Find("Canvas").transform.position = GameObject.Find("Disappear").transform.position; // canvas appears
         instrText = GameObject.Find("instrText");
         trainingText = GameObject.Find("trainingText");
         nameInputField = GameObject.Find("nameInput").GetComponent<TMP_InputField>();
