@@ -210,6 +210,7 @@ public class StimControl : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
         {
+            GameObject.Find("Canvas").transform.position = GameObject.Find("cuePos").transform.position; // canvas appears
             logFile = dataPath + nameInputField.text + "rtData-" + System.DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + ".csv";
             if (!Directory.Exists(dataPath))
             {
@@ -550,6 +551,7 @@ public class StimControl : MonoBehaviour
     void Start()
     {
         phase = 2;
+        GameObject.Find("Canvas").transform.position = GameObject.Find("Disappear").transform.position; // canvas appears
         instrText = GameObject.Find("instrText");
         trainingText = GameObject.Find("trainingText");
         nameInputField = GameObject.Find("nameInput").GetComponent<TMP_InputField>();
