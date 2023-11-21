@@ -516,7 +516,7 @@ public class StimControl : MonoBehaviour
 
         bool correctResponse = CheckResponseCorrectness();
         string trialResult = correctResponse ? "Correct" : "Incorrect";
-        string logEntry = $"{logStartTime},{reactionTime},{ecc[posIndex]},{stimuli[stimIndex]},{pressedKey},{trialResult}\n";
+        string logEntry = $"{logStartTime},{reactionTime},{stimuli[stimIndex]},{pressedKey},{trialResult}\n";
         File.AppendAllText(logFile, logEntry);
     }
 
