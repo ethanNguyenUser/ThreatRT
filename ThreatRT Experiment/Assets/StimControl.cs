@@ -284,59 +284,93 @@ public class StimControl : MonoBehaviour
     }
 
 
-    //IEnumerator phase2() // training phase
-    //{
-    //    phase *= -1;
-    //    if (!in_use)
-    //    {
-    //        if (Input.GetKeyDown(KeyCode.V)) { responseKey = "Face1"; }
-    //        else if (Input.GetKeyDown(KeyCode.B)) { responseKey = "Face2"; }
-    //        else if (Input.GetKeyDown(KeyCode.N)) { responseKey = "Face3"; }
-    //        if (responseKey != "")
-    //        {
-    //            in_use = true;
-    //            for (int k = 0; k < stimuli.Length; k++)
-    //            {
-    //                GameObject.Find(stimuli[k]).transform.position = GameObject.Find("Disappear").transform.position;
-    //            }
-    //            if (start)
-    //            {
-    //                if (stimuli[stimIndex] == responseKey)
-    //                {
-    //                    trainingText.GetComponent<TextMeshPro>().text = "Correct!";
-    //                    trainingText.transform.position = GameObject.Find("textPos").transform.position;
-    //                    yield return new WaitForSecondsRealtime((float)1.5);
-    //                    trainingText.transform.position = GameObject.Find("Disappear").transform.position;
-    //                }
-    //                else
-    //                {
-    //                    trainingText.GetComponent<TextMeshPro>().text = "Incorrect.";
-    //                    trainingText.transform.position = GameObject.Find("textPos").transform.position;
-    //                    yield return new WaitForSecondsRealtime((float)1.5);
-    //                    trainingText.transform.position = GameObject.Find("Disappear").transform.position;
-    //                }
-    //            }
-    //            for (int k = 0; k < stimuli.Length; k++)
-    //            {
-    //                GameObject.Find(stimuli[k]).transform.position = GameObject.Find("Disappear").transform.position;
-    //            }
-    //            responseKey = "";
-    //            if (currentTrial > trainingTrials)
-    //            {
-    //                trainingText.GetComponent<TextMeshPro>().text = "";
-    //                trainingText.transform.position = GameObject.Find("textPos").transform.position;
-    //                currentTrial = 1;
-    //                phase = 3;
-    //                start = false;
-    //                yield break;
-    //            }
-    //            StartCoroutine(change());
-    //        }
-    //    }
-    //    phase *= -1;
-    //}
+    /*IEnumerator phase2() // training phase
+    {
+        phase *= -1;
+        if (!in_use)
+        {
+            if (Input.GetKeyDown(KeyCode.V)) { responseKey = "Face1"; }
+            else if (Input.GetKeyDown(KeyCode.B)) { responseKey = "Face2"; }
+            else if (Input.GetKeyDown(KeyCode.N)) { responseKey = "Face3"; }
+            if (responseKey != "")
+            {
+                in_use = true;
+                for (int k = 0; k < stimuli.Length; k++)
+                {
+                    GameObject.Find(stimuli[k]).transform.position = GameObject.Find("Disappear").transform.position;
+                }
+                if (start)
+                {
+                    if (stimuli[stimIndex] == responseKey)
+                    {
+                        trainingText.GetComponent<TextMeshPro>().text = "Correct!";
+                        trainingText.transform.position = GameObject.Find("textPos").transform.position;
+                        yield return new WaitForSecondsRealtime((float)1.5);
+                        trainingText.transform.position = GameObject.Find("Disappear").transform.position;
+                    }
+                    else
+                    {
+                        trainingText.GetComponent<TextMeshPro>().text = "Incorrect.";
+                        trainingText.transform.position = GameObject.Find("textPos").transform.position;
+                        yield return new WaitForSecondsRealtime((float)1.5);
+                        trainingText.transform.position = GameObject.Find("Disappear").transform.position;
+                    }
+                }
+                for (int k = 0; k < stimuli.Length; k++)
+                {
+                    GameObject.Find(stimuli[k]).transform.position = GameObject.Find("Disappear").transform.position;
+                }
+                responseKey = "";
+                if (currentTrial > trainingTrials)
+                {
+                    trainingText.GetComponent<TextMeshPro>().text = "";
+                    trainingText.transform.position = GameObject.Find("textPos").transform.position;
+                    currentTrial = 1;
+                    phase = 3;
+                    start = false;
+                    yield break;
+                }
+                StartCoroutine(change());
+            }
+        }
+        phase *= -1;
+    }*/
 
     IEnumerator phase2() // training phase
+    {
+        phase *= -1;
+        if (!in_use)
+        {
+            if (Input.GetKeyDown(KeyCode.B)) { responseKey = "Threat"; }
+            else if (Input.GetKeyDown(KeyCode.N)) { responseKey = "Food"; }
+            if (responseKey != "")
+            {
+                in_use = true;
+                ClearStimuli();
+                if (start)
+                {
+                    trainingText.GetComponent<TextMeshPro>().text = CheckResponseCorrectness() ? "Correct!" : "Incorrect."; ;
+                    trainingText.transform.position = GameObject.Find("textPos").transform.position;
+                    yield return new WaitForSecondsRealtime((float)1.5);
+                }
+                ClearStimuli();
+                responseKey = "";
+                if (currentTrial > trainingTrials)
+                {
+                    trainingText.GetComponent<TextMeshPro>().text = "";
+                    trainingText.transform.position = GameObject.Find("textPos").transform.position;
+                    currentTrial = 1;
+                    phase = 3;
+                    start = false;
+                    yield break;
+                }
+                ShowSingleStimulusForTraining();
+            }
+        }
+        phase *= -1;
+    }
+
+    /*IEnumerator phase2() // training phase
     {
         phase *= -1;
         while (currentTrial <= trainingTrials)
@@ -363,7 +397,7 @@ public class StimControl : MonoBehaviour
         trainingText.transform.position = GameObject.Find("Disappear").transform.position;
         currentTrial = 1;
         phase = 3; // Move to break phase
-    }
+    }*/
 
     // Method to show a single stimulus for training
     private void ShowSingleStimulusForTraining()
