@@ -101,54 +101,7 @@ public class StimControl : MonoBehaviour
 
     IEnumerator change()
     {
-        /*currentTrial++;
-        yield return new WaitForSecondsRealtime(preCue_time); // wait before trial starts
-        GameObject.Find("Cue").transform.position = GameObject.Find("cuePos").transform.position; // Cue appears at center
-        log = DateTimeOffset.Now.ToUnixTimeMilliseconds() + ","; // CueShowTime
-        yield return new WaitForSecondsRealtime(cue_time); // Cue stays there for this long
-
-        // randomizes stimulus every round
-        posIndex = rnd.Next(0, pos.Length);
-        stimIndex = rnd.Next(0, stimuli.Length);
-
-        // wait time between cue and stimulus
-        cueToStim_time = (float)((rnd.NextDouble() * (time_max - time_min)) + time_min);
-
-        GameObject.Find("Cue").transform.position = GameObject.Find("Disappear").transform.position; // Cue disappears
-        // waits before showing stimulus
-        yield return new WaitForSecondsRealtime(cueToStim_time);
-
-        // shows stimulus
-        GameObject.Find(stimuli[stimIndex]).transform.position = GameObject.Find(pos[posIndex]).transform.position; // StimType appears
-        log += DateTimeOffset.Now.ToUnixTimeMilliseconds() + ","; // ObjShowTime
-        start = true;
-        in_use = false;*/
-
-
-        currentTrial++;
-        yield return new WaitForSecondsRealtime(preCue_time); // wait before trial starts
-        GameObject.Find("Cue").transform.position = GameObject.Find("cuePos").transform.position; // Cue appears at center
-        log = DateTimeOffset.Now.ToUnixTimeMilliseconds() + ","; // CueShowTime
-        yield return new WaitForSecondsRealtime(cue_time); // Cue stays there for this long
-
-
-        // wait time between cue and stimulus
-        cueToStim_time = (float)((rnd.NextDouble() * (time_max - time_min)) + time_min);
-
-        GameObject.Find("Cue").transform.position = GameObject.Find("Disappear").transform.position; // Cue disappears
-        // waits before showing stimulus
-        yield return new WaitForSecondsRealtime(cueToStim_time);
-
-        // Randomize stimulus and position with delay
-        int delayIndex = rnd.Next(delay.Length);
-        int stimulusPair = rnd.Next(0, 4); // 0 for snake-apple, 1 for snake-banana, 2 for spider-apple, 3 for spider-banana
-        ShowStimulusPair(stimulusPair, delay[delayIndex]);
-        log += DateTimeOffset.Now.ToUnixTimeMilliseconds() + ","; // ObjShowTime
-        start = true;
-        in_use = false;
-
-
-        /*if (currentTrial <= totalTrials)
+        if (currentTrial <= totalTrials)
         {
             yield return new WaitForSecondsRealtime(preCue_time);
             GameObject.Find("Cue").transform.position = GameObject.Find("cuePos").transform.position;
@@ -170,7 +123,7 @@ public class StimControl : MonoBehaviour
         {
             phase = 5; // Move to next phase after all trials
         }
-        */
+
     }
 
     // Method for showing stimulus pair with delay
@@ -283,59 +236,6 @@ public class StimControl : MonoBehaviour
         }
     }
 
-
-    /*IEnumerator phase2() // training phase
-    {
-        phase *= -1;
-        if (!in_use)
-        {
-            if (Input.GetKeyDown(KeyCode.V)) { responseKey = "Face1"; }
-            else if (Input.GetKeyDown(KeyCode.B)) { responseKey = "Face2"; }
-            else if (Input.GetKeyDown(KeyCode.N)) { responseKey = "Face3"; }
-            if (responseKey != "")
-            {
-                in_use = true;
-                for (int k = 0; k < stimuli.Length; k++)
-                {
-                    GameObject.Find(stimuli[k]).transform.position = GameObject.Find("Disappear").transform.position;
-                }
-                if (start)
-                {
-                    if (stimuli[stimIndex] == responseKey)
-                    {
-                        trainingText.GetComponent<TextMeshPro>().text = "Correct!";
-                        trainingText.transform.position = GameObject.Find("textPos").transform.position;
-                        yield return new WaitForSecondsRealtime((float)1.5);
-                        trainingText.transform.position = GameObject.Find("Disappear").transform.position;
-                    }
-                    else
-                    {
-                        trainingText.GetComponent<TextMeshPro>().text = "Incorrect.";
-                        trainingText.transform.position = GameObject.Find("textPos").transform.position;
-                        yield return new WaitForSecondsRealtime((float)1.5);
-                        trainingText.transform.position = GameObject.Find("Disappear").transform.position;
-                    }
-                }
-                for (int k = 0; k < stimuli.Length; k++)
-                {
-                    GameObject.Find(stimuli[k]).transform.position = GameObject.Find("Disappear").transform.position;
-                }
-                responseKey = "";
-                if (currentTrial > trainingTrials)
-                {
-                    trainingText.GetComponent<TextMeshPro>().text = "";
-                    trainingText.transform.position = GameObject.Find("textPos").transform.position;
-                    currentTrial = 1;
-                    phase = 3;
-                    start = false;
-                    yield break;
-                }
-                StartCoroutine(change());
-            }
-        }
-        phase *= -1;
-    }*/
-
     IEnumerator phase2() // training phase
     {
         phase *= -1;
@@ -370,37 +270,8 @@ public class StimControl : MonoBehaviour
         phase *= -1;
     }
 
-    /*IEnumerator phase2() // training phase
-    {
-        phase *= -1;
-        while (currentTrial <= trainingTrials)
-        {
-            if (!in_use)
-            {
-                in_use = true;
-                stimIndex = rnd.Next(stimuli.Length); // Randomly pick a stimulus
-                GameObject.Find(stimuli[stimIndex]).transform.position = GameObject.Find("deg0").transform.position; // Show it at the center
-
-                yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.B) || Input.GetKeyDown(KeyCode.N));
-                HandleTrainingResponse();
-
-                // Clear stimuli from screen and prepare for next trial
-                ClearStimuli();
-                currentTrial++;
-                start = false;
-                yield return new WaitForSecondsRealtime(trialDuration); // Wait for trial duration
-            }
-        }
-
-        // Training completed, move to next phase
-        trainingText.GetComponent<TextMeshPro>().text = "";
-        trainingText.transform.position = GameObject.Find("Disappear").transform.position;
-        currentTrial = 1;
-        phase = 3; // Move to break phase
-    }*/
-
     // Method to show a single stimulus for training
-     IEnumerator ShowSingleStimulusForTraining()
+    IEnumerator ShowSingleStimulusForTraining()
     {
         stimIndex = rnd.Next(stimuli.Length); // Randomly pick a stimulus
         GameObject.Find(stimuli[stimIndex]).transform.position = GameObject.Find("deg0").transform.position; // Show it at the center
@@ -460,23 +331,6 @@ public class StimControl : MonoBehaviour
         }
     }
 
-
-    //IEnumerator phase3()
-    //{
-    //    phase *= -1;
-    //    trainingText.GetComponent<TextMeshPro>().text = $"Training has finished. The experiment will begin in {countdownTime} seconds";
-    //    yield return new WaitForSecondsRealtime((float)1);
-    //    countdownTime -= 1;
-    //    phase *= -1;
-    //    if (countdownTime == 0)
-    //    {
-    //        trainingText.GetComponent<TextMeshPro>().text = "";
-    //        trainingText.transform.position = GameObject.Find("Disappear").transform.position;
-    //        StartCoroutine(change());
-    //        phase = 4;
-    //        yield break;
-    //    }
-    //}
     IEnumerator phase3()
     {
         phase *= -1;
@@ -493,45 +347,6 @@ public class StimControl : MonoBehaviour
         phase = 4; // Move to data collection phase
     }
 
-    //void phase4()
-    //{
-    //    if (!in_use)
-    //    {
-    //        if (Input.GetKeyDown(KeyCode.V)) { responseKey = "Face1"; }
-    //        else if (Input.GetKeyDown(KeyCode.B)) { responseKey = "Face2"; }
-    //        else if (Input.GetKeyDown(KeyCode.N)) { responseKey = "Face3"; }
-    //        if (responseKey != "")
-    //        {
-    //            in_use = true;
-    //            if (start)
-    //            {
-    //                log += DateTimeOffset.Now.ToUnixTimeMilliseconds() + ","; // ReactionTime
-    //                log += ecc[posIndex] + "," + stimuli[stimIndex] + "," + responseKey + ","; // independentVar, StimType, Guess
-    //                if (stimuli[stimIndex] == responseKey)
-    //                {
-    //                    log += "True\n";
-    //                }
-    //                else
-    //                {
-    //                    log += "False\n";
-    //                }
-    //                File.AppendAllText(logFile, log);
-    //                log = "";
-    //            }
-    //            for (int k = 0; k < stimuli.Length; k++)
-    //            {
-    //                GameObject.Find(stimuli[k]).transform.position = GameObject.Find("Disappear").transform.position;
-    //            }
-    //            responseKey = "";
-    //            if (currentTrial > trials)
-    //            {
-    //                phase = 5;
-    //                return;
-    //            }
-    //            StartCoroutine(change());
-    //        }
-    //    }
-    //}
     IEnumerator phase4()
     {
         while (currentTrial <= totalTrials)
@@ -559,9 +374,6 @@ public class StimControl : MonoBehaviour
         phase = 5; // Move to the conclusion phase after all trials are completed
     }
 
-    // Ensure LogResponse and ClearStimuli methods are defined as before
-
-
     // Method to log participant response
     private void LogResponse()
     {
@@ -574,18 +386,6 @@ public class StimControl : MonoBehaviour
         File.AppendAllText(logFile, logEntry);
     }
 
-    // Make sure CheckResponseCorrectness and ClearStimuli methods are as previously defined
-
-
-    //IEnumerator phase5()
-    //{
-    //    phase *= -1;
-    //    instrText.GetComponent<TextMeshPro>().text = "Thank you for taking data for us! Please take your demographics survey now";
-    //    instrText.transform.position = GameObject.Find("textPos").transform.position;
-    //    yield return new WaitForSecondsRealtime((float)2);
-    //    UnityEditor.EditorApplication.isPlaying = false;
-    //    phase *= -1;
-    //}
     IEnumerator phase5()
     {
         phase *= -1;
@@ -595,13 +395,6 @@ public class StimControl : MonoBehaviour
         UnityEditor.EditorApplication.isPlaying = false; // or Application.Quit() for built applications
     }
 
-
-    //void Start()
-    //{
-    //    instrText = GameObject.Find("instrText");
-    //    trainingText = GameObject.Find("trainingText");
-    //    nameInputField = GameObject.Find("nameInput").GetComponent<TMP_InputField>(); ; // UI object for name Input
-    //}
     void Start()
     {
         //phase = 0;
@@ -612,45 +405,6 @@ public class StimControl : MonoBehaviour
         // Additional initialization code here if necessary
     }
 
-
-    //void Update()
-    //{
-    //    if (Input.GetKey(KeyCode.Escape))
-    //    {
-    //        // this only works in editor view
-    //        UnityEditor.EditorApplication.isPlaying = false;
-    //        // this only works for built programs
-    //        // Application.Quit();
-    //    }
-    //    else if (phase < 0)
-    //    {
-    //        return;
-    //    }
-    //    else if (phase == 0) // name input
-    //    {
-    //        phase0();
-    //    }
-    //    else if (phase == 1) // in instructions / start phase
-    //    {
-    //        phase1();
-    //    }
-    //    else if (phase == 2) // in training phase
-    //    {
-    //        StartCoroutine(phase2());
-    //    }
-    //    else if (phase == 3) // break between training and data taking
-    //    {
-    //        StartCoroutine(phase3());
-    //    }
-    //    else if (phase == 4) // in data taking phase
-    //    {
-    //        phase4();
-    //    }
-    //    else if (phase == 5) // thank you / demographics survey reminder
-    //    {
-    //        StartCoroutine(phase5());
-    //    }
-    //}
     void Update()
     {
         if (Input.GetKey(KeyCode.Escape))
