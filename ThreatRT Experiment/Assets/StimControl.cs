@@ -7,7 +7,7 @@ using System;
 using TMPro;
 
 /* TODO
- * add high score list
+ * Fix phase 3-5
  */
 
 /* NEEDS
@@ -23,10 +23,10 @@ public class StimControl : MonoBehaviour
 {
     // independent variable being tested
     // calculated for 10m distance from camera to deg0
-    public string[] pos = { "deg0", "deg30", "deg-30" }; // different random positions available (Unity object names)
+    public string[] pos = { "deg30", "deg-30" }; // different random positions available (Unity object names)
     public string[] ecc = { "0", "+30", "-30" }; // names to write to csv file, corresponding respectively to pos
     public int[] delay = { -100, -50, -25, 0, 25, 50, 100 };
-    public string[] stimuli = { "snake", "spider", "apple", "banana"}; // names of different stimuli
+    public string[] stimuli = { "snake", "spider", "apple", "banana" }; // names of different stimuli
 
     // self explanatory
     public string[] instrTextValues = {
@@ -88,7 +88,7 @@ public class StimControl : MonoBehaviour
     private string log; // new line of data
     private int instrNum = 0; // index used to increment instructions
     private bool keyReleased = false;
-    private int posIndex, stimIndex; // indices for pos and stimuli respectively randomized later in code (need global scope since they're used in multiple functions)
+    private int stimIndex; // indices for pos and stimuli respectively randomized later in code (need global scope since they're used in multiple functions)
     public GameObject instrText; // text object for instructions
     public GameObject trainingText; // text object for training
     public TMP_InputField nameInputField; // UI object for name Input
@@ -101,29 +101,54 @@ public class StimControl : MonoBehaviour
 
     IEnumerator change()
     {
-        //currentTrial++;
-        //yield return new WaitForSecondsRealtime(preCue_time); // wait before trial starts
-        //GameObject.Find("Cue").transform.position = GameObject.Find("cuePos").transform.position; // Cue appears at center
-        //log = DateTimeOffset.Now.ToUnixTimeMilliseconds() + ","; // CueShowTime
-        //yield return new WaitForSecondsRealtime(cue_time); // Cue stays there for this long
+        /*currentTrial++;
+        yield return new WaitForSecondsRealtime(preCue_time); // wait before trial starts
+        GameObject.Find("Cue").transform.position = GameObject.Find("cuePos").transform.position; // Cue appears at center
+        log = DateTimeOffset.Now.ToUnixTimeMilliseconds() + ","; // CueShowTime
+        yield return new WaitForSecondsRealtime(cue_time); // Cue stays there for this long
 
-        //// randomizes stimulus every round
-        //posIndex = rnd.Next(0, pos.Length);
-        //stimIndex = rnd.Next(0, stimuli.Length);
+        // randomizes stimulus every round
+        posIndex = rnd.Next(0, pos.Length);
+        stimIndex = rnd.Next(0, stimuli.Length);
 
-        //// wait time between cue and stimulus
-        //cueToStim_time = (float)((rnd.NextDouble() * (time_max - time_min)) + time_min);
+        // wait time between cue and stimulus
+        cueToStim_time = (float)((rnd.NextDouble() * (time_max - time_min)) + time_min);
 
-        //GameObject.Find("Cue").transform.position = GameObject.Find("Disappear").transform.position; // Cue disappears
-        //// waits before showing stimulus
-        //yield return new WaitForSecondsRealtime(cueToStim_time);
+        GameObject.Find("Cue").transform.position = GameObject.Find("Disappear").transform.position; // Cue disappears
+        // waits before showing stimulus
+        yield return new WaitForSecondsRealtime(cueToStim_time);
 
-        //// shows stimulus
-        //GameObject.Find(stimuli[stimIndex]).transform.position = GameObject.Find(pos[posIndex]).transform.position; // StimType appears
-        //log += DateTimeOffset.Now.ToUnixTimeMilliseconds() + ","; // ObjShowTime
-        //start = true;
-        //in_use = false;
-        if (currentTrial <= totalTrials)
+        // shows stimulus
+        GameObject.Find(stimuli[stimIndex]).transform.position = GameObject.Find(pos[posIndex]).transform.position; // StimType appears
+        log += DateTimeOffset.Now.ToUnixTimeMilliseconds() + ","; // ObjShowTime
+        start = true;
+        in_use = false;*/
+
+
+        currentTrial++;
+        yield return new WaitForSecondsRealtime(preCue_time); // wait before trial starts
+        GameObject.Find("Cue").transform.position = GameObject.Find("cuePos").transform.position; // Cue appears at center
+        log = DateTimeOffset.Now.ToUnixTimeMilliseconds() + ","; // CueShowTime
+        yield return new WaitForSecondsRealtime(cue_time); // Cue stays there for this long
+
+
+        // wait time between cue and stimulus
+        cueToStim_time = (float)((rnd.NextDouble() * (time_max - time_min)) + time_min);
+
+        GameObject.Find("Cue").transform.position = GameObject.Find("Disappear").transform.position; // Cue disappears
+        // waits before showing stimulus
+        yield return new WaitForSecondsRealtime(cueToStim_time);
+
+        // Randomize stimulus and position with delay
+        int delayIndex = rnd.Next(delay.Length);
+        int stimulusPair = rnd.Next(0, 4); // 0 for snake-apple, 1 for snake-banana, 2 for spider-apple, 3 for spider-banana
+        ShowStimulusPair(stimulusPair, delay[delayIndex]);
+        log += DateTimeOffset.Now.ToUnixTimeMilliseconds() + ","; // ObjShowTime
+        start = true;
+        in_use = false;
+
+
+        /*if (currentTrial <= totalTrials)
         {
             yield return new WaitForSecondsRealtime(preCue_time);
             GameObject.Find("Cue").transform.position = GameObject.Find("cuePos").transform.position;
@@ -145,14 +170,15 @@ public class StimControl : MonoBehaviour
         {
             phase = 5; // Move to next phase after all trials
         }
+        */
     }
 
     // Method for showing stimulus pair with delay
     private void ShowStimulusPair(int pairIndex, int delayTime)
     {
         string[] pair = GetStimulusPair(pairIndex);
-        int firstPosIndex = rnd.Next(0, 2); // Randomly choose between -30 and +30 degrees
-        int secondPosIndex = (firstPosIndex + 1) % 2;
+        int firstPosIndex = rnd.Next(0, 1); // Randomly choose between -30 and +30 degrees
+        int secondPosIndex = firstPosIndex == 0 ? 1 : 0; // Choose other value for second position
 
         // Show first stimulus
         GameObject.Find(pair[0]).transform.position = GameObject.Find(pos[firstPosIndex]).transform.position;
@@ -314,7 +340,6 @@ public class StimControl : MonoBehaviour
         phase *= -1;
         while (currentTrial <= trainingTrials)
         {
-            Debug.Log("hi there");
             if (!in_use)
             {
                 in_use = true;
@@ -590,7 +615,6 @@ public class StimControl : MonoBehaviour
         }
         else if (phase == 2)
         {
-            Debug.Log("reached here");
             StartCoroutine(phase2()); // Training phase
         }
         else if (phase == 3)
