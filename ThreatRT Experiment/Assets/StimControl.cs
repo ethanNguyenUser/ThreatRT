@@ -397,8 +397,8 @@ public class StimControl : MonoBehaviour
 
     void Start()
     {
-        //phase = 0;
-        //GameObject.Find("Canvas").transform.position = GameObject.Find("Disappear").transform.position; // canvas appears
+        phase = 0;
+        GameObject.Find("Canvas").transform.position = GameObject.Find("Disappear").transform.position; // canvas appears
         instrText = GameObject.Find("instrText");
         trainingText = GameObject.Find("trainingText");
         nameInputField = GameObject.Find("nameInput").GetComponent<TMP_InputField>();
