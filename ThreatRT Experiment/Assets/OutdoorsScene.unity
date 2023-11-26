@@ -155,13 +155,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pos:
-  - deg0
   - deg30
   - deg-30
-  ecc:
-  - 0
-  - +30
-  - -30
   delay: 9cffffffceffffffe7ffffff00000000190000003200000064000000
   stimuli:
   - snake
@@ -169,26 +164,25 @@ MonoBehaviour:
   - apple
   - banana
   instrTextValues:
-  - "You will be reacting to four different stimuli in this protocol:\r\n       
-    snake, spider, apple, and banana. \r\n        To react, you will be pressing
-    the keys\r\n        b, for the snake and spider \r\n        n, for the apple
-    and banana\r\n        Please try to react to the stimuli and don't try to anticipate
-    them.\r\n        Press Spacebar when ready."
+  - "You will be reacting to four different stimuli in this protocol:\n        snake,
+    spider, apple, and banana. \n        To react, you will be pressing the keys\n       
+    b, for the snake and spider \n        n, for the apple and banana\n        Please
+    try to react to the stimuli and don't try to anticipate them.\n        Press
+    Spacebar when ready."
   - This is a snake. Press b to continue.
   - This is a spider. Press b to continue.
   - This is an apple. Press n to continue.
   - This is a banana. Press n to continue.
-  - "Here are some practice rounds to familiarize you with the protocol.\r\n       
+  - "Here are some practice rounds to familiarize you with the protocol.\n       
     Press Spacebar to begin."
   currentTrial: 1
-  trainingTrials: 3
-  trials: 5
+  trainingTrials: 20
   preCue_time: 0.5
   cue_time: 0.2
   time_min: 0.5
   time_max: 1.5
   cueToStim_time: 0
-  countdownTime: 5
+  countdownTime: 15
   phase: 0
   instrText: {fileID: 0}
   trainingText: {fileID: 0}
@@ -2227,13 +2221,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2483b9bd782f9449a5972b61b7d51a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_CameraFloorOffsetObject: {fileID: 111044647}
-  m_RequestedTrackingMode: 0
-  m_TrackingOriginMode: 1
-  m_TrackingSpace: 0
-  m_CameraYOffset: 1.36144
-  m_CameraInitialized: 1
-  m_CameraInitializing: 0
 --- !u!1 &1510266112
 GameObject:
   m_ObjectHideFlags: 0
@@ -2962,15 +2949,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a2a9c34df4095f47b9ca8f975175f5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Device: 0
-  m_PoseSource: 2
-  m_PoseProviderComponent: {fileID: 0}
-  m_TrackingType: 2
-  m_UpdateType: 0
-  m_UseRelativeTransform: 0
-  m_OriginPose:
-    position: {x: 0, y: 0, z: 0}
-    rotation: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1 &1841594155
 GameObject:
   m_ObjectHideFlags: 0

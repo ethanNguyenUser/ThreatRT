@@ -122,7 +122,7 @@ public class StimControl : MonoBehaviour
         // counter for finishing the program
         currentTrial = 1;
         trainingTrials = 20;
-        totalTrials = 30;
+        totalTrials = 140;
 
         // global variables for time
         preCue_time = (float)0.5; // wait time before cue is shown after trial ends
@@ -151,7 +151,7 @@ public class StimControl : MonoBehaviour
         keyReleased = false;
 
         // New variables for experiment
-        phase = 4; //set starting phase here
+        phase = 0; //set starting phase here
         threatKey = KeyCode.G;
         foodKey = KeyCode.H;
 
@@ -405,14 +405,14 @@ public class StimControl : MonoBehaviour
             File.AppendAllText(logFile, logEntry);
             currentTrial++;
         }
-
+        ClearStimuli();
         phase = 5;
     }
 
     IEnumerator phase5()
     {
         phase *= -1;
-        instrText.GetComponent<TextMeshPro>().text = "Thank you for participating! Please complete the demographics survey.";
+        instrText.GetComponent<TextMeshPro>().text = "Experiment over\nThank you for participating!";
         instrText.transform.position = GameObject.Find("textPos").transform.position;
         yield return new WaitForSecondsRealtime(5);
         UnityEditor.EditorApplication.isPlaying = false; // or Application.Quit() for built applications
