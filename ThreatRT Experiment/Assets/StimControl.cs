@@ -21,54 +21,34 @@ using TMPro;
 
 public class StimControl : MonoBehaviour
 {
+    //------------------------------------------------Define variables here, initialize in Start()-------------------------------------------------
+
     // independent variable being tested
     // calculated for 10m distance from camera to deg0
-    public string[] pos = { "deg30", "deg-30" }; // different random positions available (Unity object names)
-    public string[] ecc = { "0", "+30", "-30" }; // names to write to csv file, corresponding respectively to pos
-    public int[] delay = { -100, -50, -25, 0, 25, 50, 100 };
-    public string[] stimuli = { "snake", "spider", "apple", "banana" }; // names of different stimuli
+    public string[] pos; // different random positions available (Unity object names)
+    public int[] delay;
+    public string[] stimuli; // names of different stimuli
 
     // self explanatory
-    public string[] instrTextValues = {
-    // instruction 1
-    @"You will be reacting to four different stimuli in this protocol:
-        snake, spider, apple, and banana. 
-        To react, you will be pressing the keys
-        b, for the snake and spider 
-        n, for the apple and banana
-        Please try to react to the stimuli and don't try to anticipate them.
-        Press Spacebar when ready.",
-    // instruction 2
-    @"This is a snake. Press b to continue.",
-    // instruction 3
-    @"This is a spider. Press b to continue.",
-    // instruction 4
-    @"This is an apple. Press n to continue.",
-    // instruction 5
-    @"This is a banana. Press n to continue.",
-    // instruction 6
-    @"Here are some practice rounds to familiarize you with the protocol.
-        Press Spacebar to begin.",
-    };
+    public string[] instrTextValues;
 
     // counter for finishing the program
-    public int currentTrial = 1;
-    public int trainingTrials = 3;
-    public int trials = 5;
+    public int currentTrial;
+    public int trainingTrials;
+    private int totalTrials;
 
     // global variables for time
-    public float preCue_time = (float)0.5; // wait time before cue is shown after trial ends
-    public float cue_time = (float)0.2; // time that the cue is on screen
-    public float time_min = (float)0.5; // minimum time between cue disappears and stimulus    
-    public float time_max = (float)1.5; // maximum time between cue disappears and stimulus
-    public float cueToStim_time = (float)0; // randomly set later in code
+    public float preCue_time;
+    // wait time before cue is shown after trial ends
+    public float cue_time; // time that the cue is on screen
+    public float time_min; // minimum time between cue disappears and stimulus    
+    public float time_max; // maximum time between cue disappears and stimulus
+    public float cueToStim_time; // randomly set later in code
 
-    public int countdownTime = 5; // time between training and experiment phase
+    public int countdownTime; // time between training and experiment phase
 
     // phase of experiment
-    public int phase = 0;
-    private bool in_use = false;    // avoid user clicking multiple buttons at same time
-    private bool start = false;     // it's the first trial
+    public int phase;
     /*
      * Phase -1,-2,-3... = in-between phase 1, 2, or 3, while co-routines are in the middle of running
      * Phase 0 = name input
@@ -81,328 +61,113 @@ public class StimControl : MonoBehaviour
      */
 
     //misc variables
-    static string dataPath = Directory.GetCurrentDirectory() + "/Assets/Data/";
+    static string dataPath;
     string logFile; // fileName, set in phase 0 after getting participant name
-    Random rnd = new Random();
-    private string responseKey = "";
-    private string log; // new line of data
-    private int instrNum = 0; // index used to increment instructions
-    private bool keyReleased = false;
+    Random rnd;
+    private string responseKey;
+    private int instrNum; // index used to increment instructions
+    private bool keyReleased;
     private int stimIndex; // indices for pos and stimuli respectively randomized later in code (need global scope since they're used in multiple functions)
     public GameObject instrText; // text object for instructions
     public GameObject trainingText; // text object for training
     public TMP_InputField nameInputField; // UI object for name Input
 
     // New variables for experiment
-    private int totalTrials = 140;
-    private float trialDuration = 4f; // Duration of each trial in seconds
-    private long logStartTime = 0; // Timestamp when a stimulus is displayed
+    private float trialDuration; // Duration of each trial in seconds
+    private long logStartTime; // Timestamp when a stimulus is displayed
 
+    private KeyCode threatKey;
+    private KeyCode foodKey;
 
-    IEnumerator change()
-    {
-        if (currentTrial <= totalTrials)
-        {
-            yield return new WaitForSecondsRealtime(preCue_time);
-            GameObject.Find("Cue").transform.position = GameObject.Find("cuePos").transform.position;
-            log = DateTimeOffset.Now.ToUnixTimeMilliseconds() + ","; // CueShowTime
-
-            yield return new WaitForSecondsRealtime(cue_time);
-            GameObject.Find("Cue").transform.position = GameObject.Find("Disappear").transform.position;
-
-            // Randomize stimulus and position with delay
-            int delayIndex = rnd.Next(delay.Length);
-            int stimulusPair = rnd.Next(0, 4); // 0 for snake-apple, 1 for snake-banana, 2 for spider-apple, 3 for spider-banana
-            ShowStimulusPair(stimulusPair, delay[delayIndex]);
-
-            start = true;
-            in_use = false;
-            currentTrial++;
-        }
-        else
-        {
-            phase = 5; // Move to next phase after all trials
-        }
-
-    }
-
-    // Method for showing stimulus pair with delay
-    private void ShowStimulusPair(int pairIndex, int delayTime)
-    {
-        string[] pair = GetStimulusPair(pairIndex);
-        int firstPosIndex = rnd.Next(0, 1); // Randomly choose between -30 and +30 degrees
-        int secondPosIndex = firstPosIndex == 0 ? 1 : 0; // Choose other value for second position
-
-        // Show first stimulus
-        GameObject.Find(pair[0]).transform.position = GameObject.Find(pos[firstPosIndex]).transform.position;
-        StartCoroutine(ShowSecondStimulusWithDelay(pair[1], pos[secondPosIndex], delayTime));
-    }
-
-    // Coroutine to show second stimulus after a delay
-    IEnumerator ShowSecondStimulusWithDelay(string stimulus, string position, int delayTime)
-    {
-        yield return new WaitForSecondsRealtime(Math.Abs(delayTime) / 1000.0f);
-        logStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds(); // Set log start time
-        GameObject.Find(stimulus).transform.position = GameObject.Find(position).transform.position;
-    }
-
-    // Method to return a pair of stimuli based on index
-    private string[] GetStimulusPair(int index)
-    {
-        switch (index)
-        {
-            case 0: return new string[] { "snake", "apple" };
-            case 1: return new string[] { "snake", "banana" };
-            case 2: return new string[] { "spider", "apple" };
-            case 3: return new string[] { "spider", "banana" };
-            default: return new string[] { "apple", "banana" }; // Default case
-        }
-    }
-
-    void phase0()
-    {
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
-        {
-            //GameObject.Find("Canvas").transform.position = GameObject.Find("cuePos").transform.position; // canvas appears
-            logFile = dataPath + nameInputField.text + "rtData-" + System.DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + ".csv";
-            if (!Directory.Exists(dataPath))
-            {
-                Directory.CreateDirectory(dataPath);
-            }
-            File.WriteAllText(logFile, "CueShowTime,ObjShowTime,ReactionTime,Eccentricity,StimType,Guess,Correct\n");
-
-            Debug.Log($"Data file started for {nameInputField.text}");
-            GameObject.Find("Canvas").transform.position = GameObject.Find("Disappear").transform.position; // canvas disappears
-
-            phase = 1;
-            instrText.GetComponent<TextMeshPro>().text = instrTextValues[instrNum];
-            instrText.transform.position = GameObject.Find("textPos").transform.position;
-            return;
-        }
-    }
-
-    void phase1() // start and instruction phase
-    {
-        if (Input.GetKeyDown(KeyCode.Space) && instrNum == 0)
-        {
-            instrNum++;
-            instrText.GetComponent<TextMeshPro>().text = instrTextValues[instrNum];
-            GameObject.Find("snake").transform.position = GameObject.Find("deg0").transform.position;
-        }
-        else if (Input.GetKeyDown(KeyCode.B) && instrNum == 1)
-        {
-            instrNum++;
-            instrText.GetComponent<TextMeshPro>().text = instrTextValues[instrNum];
-            GameObject.Find("snake").transform.position = GameObject.Find("Disappear").transform.position;
-            GameObject.Find("spider").transform.position = GameObject.Find("deg0").transform.position;
-        }
-        else if (instrNum == 1 && !Input.GetKeyDown(KeyCode.B)) //this is required or else we will skip instrNum == 2 case due to the user having already pressed B
-        {
-            keyReleased = true;
-        }
-        else if (Input.GetKeyDown(KeyCode.B) && instrNum == 2 && keyReleased)
-        {
-            instrNum++;
-            instrText.GetComponent<TextMeshPro>().text = instrTextValues[instrNum];
-            GameObject.Find("spider").transform.position = GameObject.Find("Disappear").transform.position;
-            GameObject.Find("apple").transform.position = GameObject.Find("deg0").transform.position;
-            keyReleased = false;
-        }
-        else if (Input.GetKeyDown(KeyCode.N) && instrNum == 3)
-        {
-            instrNum++;
-            instrText.GetComponent<TextMeshPro>().text = instrTextValues[instrNum];
-            GameObject.Find("apple").transform.position = GameObject.Find("Disappear").transform.position;
-            GameObject.Find("banana").transform.position = GameObject.Find("deg0").transform.position;
-        }
-        else if (instrNum == 3 && !Input.GetKeyDown(KeyCode.N))
-        {
-            keyReleased = true;
-        }
-        else if (Input.GetKeyDown(KeyCode.N) && instrNum == 4)
-        {
-            instrNum++;
-            instrText.GetComponent<TextMeshPro>().text = instrTextValues[instrNum];
-            GameObject.Find("banana").transform.position = GameObject.Find("Disappear").transform.position;
-            keyReleased = false;
-        }
-        else if (Input.GetKeyDown(KeyCode.Space) && instrNum == 5)
-        {
-            instrText.GetComponent<TextMeshPro>().text = instrTextValues[instrNum];
-            instrText.transform.position = GameObject.Find("Disappear").transform.position;
-            phase = 2;
-            StartCoroutine(change());
-            start = false;
-        }
-    }
-
-    IEnumerator phase2() // training phase
-    {
-        phase *= -1;
-        if (!in_use)
-        {
-            if (Input.GetKeyDown(KeyCode.B)) { responseKey = "Threat"; }
-            else if (Input.GetKeyDown(KeyCode.N)) { responseKey = "Food"; }
-            if (responseKey != "")
-            {
-                in_use = true;
-                ClearStimuli();
-                if (start)
-                {
-                    trainingText.GetComponent<TextMeshPro>().text = CheckResponseCorrectness() ? "Correct!" : "Incorrect."; ;
-                    trainingText.transform.position = GameObject.Find("textPos").transform.position;
-                    yield return new WaitForSecondsRealtime((float)1.5);
-                }
-                ClearStimuli();
-                responseKey = "";
-                if (currentTrial > trainingTrials)
-                {
-                    trainingText.GetComponent<TextMeshPro>().text = "";
-                    trainingText.transform.position = GameObject.Find("textPos").transform.position;
-                    currentTrial = 1;
-                    phase = 3;
-                    start = false;
-                    yield break;
-                }
-                ShowSingleStimulusForTraining();
-            }
-        }
-        phase *= -1;
-    }
-
-    // Method to show a single stimulus for training
-    IEnumerator ShowSingleStimulusForTraining()
-    {
-        stimIndex = rnd.Next(stimuli.Length); // Randomly pick a stimulus
-        GameObject.Find(stimuli[stimIndex]).transform.position = GameObject.Find("deg0").transform.position; // Show it at the center
-
-        currentTrial++;
-        yield return new WaitForSecondsRealtime(preCue_time); // wait before trial starts
-        GameObject.Find("Cue").transform.position = GameObject.Find("cuePos").transform.position; // Cue appears at center
-        yield return new WaitForSecondsRealtime(cue_time); // Cue stays there for this long
-
-        // randomizes stimulus every round
-        stimIndex = rnd.Next(0, stimuli.Length);
-
-        // wait time between cue and stimulus
-        cueToStim_time = (float)((rnd.NextDouble() * (time_max - time_min)) + time_min);
-
-        GameObject.Find("Cue").transform.position = GameObject.Find("Disappear").transform.position; // Cue disappears
-        // waits before showing stimulus
-        yield return new WaitForSecondsRealtime(cueToStim_time);
-
-        // shows stimulus
-        GameObject.Find(stimuli[stimIndex]).transform.position = GameObject.Find("deg0").transform.position; // StimType appears
-        start = true;
-        in_use = false;
-    }
-
-    // Method to handle training response and provide feedback
-    private void HandleTrainingResponse()
-    {
-        bool correct = CheckResponseCorrectness();
-        string feedbackText = correct ? "Correct!" : "Incorrect.";
-        trainingText.GetComponent<TextMeshPro>().text = feedbackText;
-        trainingText.transform.position = GameObject.Find("textPos").transform.position;
-        StartCoroutine(ClearFeedbackAfterDelay(1.5f)); // Show feedback for 1.5 seconds
-    }
-
-    // Method to check if the response is correct
-    private bool CheckResponseCorrectness()
-    {
-        string pressedKey = Input.GetKeyDown(KeyCode.B) ? "B" : "N";
-        bool isThreateningStimulus = (stimuli[stimIndex] == "snake" || stimuli[stimIndex] == "spider");
-        return (isThreateningStimulus && pressedKey == "B") || (!isThreateningStimulus && pressedKey == "N");
-    }
-
-    // Coroutine to clear feedback after a delay
-    IEnumerator ClearFeedbackAfterDelay(float delay)
-    {
-        yield return new WaitForSecondsRealtime(delay);
-        trainingText.transform.position = GameObject.Find("Disappear").transform.position;
-    }
-
-    // Method to clear stimuli from screen
-    private void ClearStimuli()
-    {
-        foreach (string stimulus in stimuli)
-        {
-            GameObject.Find(stimulus).transform.position = GameObject.Find("Disappear").transform.position;
-        }
-    }
-
-    IEnumerator phase3()
-    {
-        phase *= -1;
-        trainingText.GetComponent<TextMeshPro>().text = $"Training complete. The experiment will begin in {countdownTime} seconds.";
-        while (countdownTime > 0)
-        {
-            yield return new WaitForSecondsRealtime(1);
-            countdownTime--;
-            trainingText.GetComponent<TextMeshPro>().text = $"Training complete. The experiment will begin in {countdownTime} seconds.";
-        }
-
-        trainingText.GetComponent<TextMeshPro>().text = "";
-        trainingText.transform.position = GameObject.Find("Disappear").transform.position;
-        phase = 4; // Move to data collection phase
-    }
-
-    IEnumerator phase4()
-    {
-        while (currentTrial <= totalTrials)
-        {
-            if (!in_use)
-            {
-                StartCoroutine(change());
-                yield return new WaitUntil(() => start); // Wait until stimulus is shown
-
-                yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.B) || Input.GetKeyDown(KeyCode.N));
-                LogResponse();
-
-                // Clear stimuli from screen and prepare for next trial
-                ClearStimuli();
-                currentTrial++;
-                start = false;
-                yield return new WaitForSecondsRealtime(trialDuration); // Wait for trial duration
-            }
-            else
-            {
-                yield return null; // Wait for the next frame before rechecking the condition
-            }
-        }
-
-        phase = 5; // Move to the conclusion phase after all trials are completed
-    }
-
-    // Method to log participant response
-    private void LogResponse()
-    {
-        string pressedKey = Input.GetKeyDown(KeyCode.B) ? "B" : "N";
-        long reactionTime = DateTimeOffset.Now.ToUnixTimeMilliseconds() - logStartTime; // Calculate reaction time
-
-        bool correctResponse = CheckResponseCorrectness();
-        string trialResult = correctResponse ? "Correct" : "Incorrect";
-        string logEntry = $"{logStartTime},{reactionTime},{stimuli[stimIndex]},{pressedKey},{trialResult}\n";
-        File.AppendAllText(logFile, logEntry);
-    }
-
-    IEnumerator phase5()
-    {
-        phase *= -1;
-        instrText.GetComponent<TextMeshPro>().text = "Thank you for participating! Please complete the demographics survey.";
-        instrText.transform.position = GameObject.Find("textPos").transform.position;
-        yield return new WaitForSecondsRealtime(5);
-        UnityEditor.EditorApplication.isPlaying = false; // or Application.Quit() for built applications
-    }
-
+    // Initialize variables with Start() to avoid requirement to reset the script in Unity everytime a value is changed
     void Start()
     {
-        phase = 0;
-        GameObject.Find("Canvas").transform.position = GameObject.Find("Disappear").transform.position; // canvas appears
+        pos = new string[] { "deg30", "deg-30" }; // different random positions available (Unity object names)
+        delay = new int[] { 0, 25, 50, 100 };
+        stimuli = new string[] { "snake", "spider", "apple", "banana" }; // names of different stimuli
+
+        // self explanatory
+        instrTextValues = new string[] {
+            // instruction 0
+            @"You will be reacting to four different stimuli in this protocol:
+            snake, spider, apple, and banana. 
+            To react, you will be pressing the keys
+            G, for the snake and spider 
+            H, for the apple and banana
+            Please try to react to the stimuli and don't try to anticipate them.
+            Press Spacebar when ready.",
+        // instruction 1
+        @"This is a snake. Press G to continue.",
+        // instruction 2
+        @"This is a spider. Press G to continue.",
+        // instruction 3
+        @"This is an apple. Press H to continue.",
+        // instruction 4
+        @"This is a banana. Press H to continue.",
+        // instruction 5
+        @"Here are some practice rounds to familiarize you with the protocol.
+            Press Spacebar to begin.",
+        // instruction 6
+        @"You will now be shown two stimuli
+        on the left and right of the screen 
+        at the same time. Please press
+        G, for the snake and spider or
+        H, for the apple and banana
+        for whichever stimuli you notice appear
+        on the screen first.
+        Prioritize accuracy over speed for these trials
+        Press Spacebar when ready."
+        };
+
+        // counter for finishing the program
+        currentTrial = 1;
+        trainingTrials = 20;
+        totalTrials = 30;
+
+        // global variables for time
+        preCue_time = (float)0.5; // wait time before cue is shown after trial ends
+        cue_time = (float)0.2; // time that the cue is on screen
+        time_min = (float)0.5; // minimum time between cue disappears and stimulus    
+        time_max = (float)1.5; // maximum time between cue disappears and stimulus
+        cueToStim_time = (float)0; // randomly set later in code
+
+        countdownTime = 5; // time between training and experiment phase
+
+        /*
+         * Phase -1,-2,-3... = in-between phase 1, 2, or 3, while co-routines are in the middle of running
+         * Phase 0 = name input
+         * Phase 1 = start / instructions
+         * Phase 2 = training phase
+         * Phase 3 = break 
+         * Phase 4 = data taking phase
+         * Phase 5 = thank you screen / demographics survey reminder\
+         */
+
+        //misc variables
+        dataPath = Directory.GetCurrentDirectory() + "/Assets/Data/";
+        rnd = new Random();
+        responseKey = "";
+        instrNum = 0; // index used to increment instructions
+        keyReleased = false;
+
+        // New variables for experiment
+        phase = 4; //set starting phase here
+        threatKey = KeyCode.G;
+        foodKey = KeyCode.H;
+
+        // Initialize CSV file for data logging
+        logFile = dataPath + "Testing.csv"; // Example file name
+        if (!Directory.Exists(dataPath))
+        {
+            Directory.CreateDirectory(dataPath);
+        }
+        File.WriteAllText(logFile, "DecisionTimeMs,DelayMs,StimType1st,StimType2nd,StimPos1st,StimPos2nd,KeyPressed,Correct\n");
+
+        //------------------------------------------End of variable initalization-----------------------------------------
+        GameObject.Find("Canvas").transform.position = GameObject.Find("Disappear").transform.position; // hide canvas
         instrText = GameObject.Find("instrText");
         trainingText = GameObject.Find("trainingText");
         nameInputField = GameObject.Find("nameInput").GetComponent<TMP_InputField>();
-        // Additional initialization code here if necessary
     }
 
     void Update()
@@ -441,4 +206,232 @@ public class StimControl : MonoBehaviour
         }
     }
 
+    void phase0()
+    {
+        GameObject.Find("Canvas").transform.position = GameObject.Find("deg0").transform.position; // hide canvas
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        {
+            // Get the participant's name and create the new file name
+            string newLogFile = dataPath + nameInputField.text + "_" + System.DateTime.Now.ToString("yyyy-MM-dd_HH_mm_ss") + ".csv";
+
+            // Rename the log file to include name
+            if (File.Exists(logFile))
+            {
+                File.Move(logFile, newLogFile);
+                logFile = newLogFile; // Update the logFile variable to reflect the new file name
+            }
+
+            // Proceed to the next phase
+            GameObject.Find("Canvas").transform.position = GameObject.Find("Disappear").transform.position; // hide canvas
+            phase = 1;
+        }
+    }
+
+    // Start and Instruction phase
+    void phase1()
+    {
+        instrText.GetComponent<TextMeshPro>().text = instrTextValues[instrNum];
+        instrText.transform.position = GameObject.Find("textPos").transform.position;
+        if (Input.GetKeyDown(KeyCode.Space) && instrNum == 0)
+        {
+            instrNum++;
+            instrText.GetComponent<TextMeshPro>().text = instrTextValues[instrNum];
+            GameObject.Find("snake").transform.position = GameObject.Find("deg0").transform.position;
+        }
+        else if (Input.GetKeyDown(threatKey) && instrNum == 1)
+        {
+            instrNum++;
+            instrText.GetComponent<TextMeshPro>().text = instrTextValues[instrNum];
+            GameObject.Find("snake").transform.position = GameObject.Find("Disappear").transform.position;
+            GameObject.Find("spider").transform.position = GameObject.Find("deg0").transform.position;
+        }
+        else if (instrNum == 1 && !Input.GetKeyDown(threatKey)) //this is required or else we will skip instrNum == 2 case due to the user having already pressed B
+        {
+            keyReleased = true;
+        }
+        else if (Input.GetKeyDown(threatKey) && instrNum == 2 && keyReleased)
+        {
+            instrNum++;
+            instrText.GetComponent<TextMeshPro>().text = instrTextValues[instrNum];
+            GameObject.Find("spider").transform.position = GameObject.Find("Disappear").transform.position;
+            GameObject.Find("apple").transform.position = GameObject.Find("deg0").transform.position;
+            keyReleased = false;
+        }
+        else if (Input.GetKeyDown(foodKey) && instrNum == 3)
+        {
+            instrNum++;
+            instrText.GetComponent<TextMeshPro>().text = instrTextValues[instrNum];
+            GameObject.Find("apple").transform.position = GameObject.Find("Disappear").transform.position;
+            GameObject.Find("banana").transform.position = GameObject.Find("deg0").transform.position;
+        }
+        else if (instrNum == 3 && !Input.GetKeyDown(foodKey))
+        {
+            keyReleased = true;
+        }
+        else if (Input.GetKeyDown(foodKey) && instrNum == 4)
+        {
+            instrNum++;
+            instrText.GetComponent<TextMeshPro>().text = instrTextValues[instrNum];
+            GameObject.Find("banana").transform.position = GameObject.Find("Disappear").transform.position;
+            keyReleased = false;
+        }
+        else if (Input.GetKeyDown(KeyCode.Space) && instrNum == 5)
+        {
+            instrText.GetComponent<TextMeshPro>().text = instrTextValues[instrNum];
+            instrText.transform.position = GameObject.Find("Disappear").transform.position;
+            phase = 2;
+        }
+    }
+    // Training Phase
+    IEnumerator phase2()
+    {
+        phase *= -1; // Indicate that the coroutine is running
+
+        while (currentTrial <= trainingTrials)
+        {
+            //----------------------------------------------------show stimulus----------------------------------------------------------
+            yield return new WaitForSecondsRealtime(preCue_time);
+            GameObject.Find("Cue").transform.position = GameObject.Find("cuePos").transform.position;
+            yield return new WaitForSecondsRealtime(cue_time);
+            GameObject.Find("Cue").transform.position = GameObject.Find("Disappear").transform.position;
+            // randomizes stimulus every round
+            stimIndex = rnd.Next(0, stimuli.Length);
+            yield return new WaitForSecondsRealtime(cueToStim_time); // waits before showing stimulus
+
+            // shows stimulus
+            GameObject.Find(stimuli[stimIndex]).transform.position = GameObject.Find("deg0").transform.position; // StimType appears
+
+            //--------------------------------------------wait for and deal with response----------------------------------------------
+            yield return new WaitUntil(() => Input.GetKeyDown(threatKey) || Input.GetKeyDown(foodKey)); // Wait for key press
+
+            responseKey = Input.GetKeyDown(threatKey) ? "Threat" : "Food";
+            string feedbackText = CheckResponseCorrectness() ? "Correct!" : "Incorrect.";
+            trainingText.GetComponent<TextMeshPro>().text = feedbackText;
+            trainingText.transform.position = GameObject.Find("textPos").transform.position;
+            yield return new WaitForSecondsRealtime(1.5f);
+            trainingText.transform.position = GameObject.Find("Disappear").transform.position;
+
+            ClearStimuli(); // Clear the screen for the next stimulus
+
+            currentTrial++;
+        }
+        phase = 3; // Move to the next phase
+    }
+
+    // Break Phase
+    IEnumerator phase3()
+    {
+        phase *= -1;
+        trainingText.GetComponent<TextMeshPro>().text = $"Training complete. The experiment will begin in {countdownTime} seconds.";
+        trainingText.transform.position = GameObject.Find("textPos").transform.position;
+        while (countdownTime > 0)
+        {
+            yield return new WaitForSecondsRealtime(1);
+            countdownTime--;
+            trainingText.GetComponent<TextMeshPro>().text = $"Training complete. The experiment will begin in {countdownTime} seconds.";
+        }
+
+        trainingText.transform.position = GameObject.Find("Disappear").transform.position;
+        phase = 4; // Move to data collection phase
+    }
+
+    // Data Collection Phase
+    IEnumerator phase4()
+    {
+        phase *= -1;
+
+        instrNum = 6;
+        instrText.GetComponent<TextMeshPro>().text = instrTextValues[instrNum];
+        instrText.transform.position = GameObject.Find("deg0").transform.position;
+        yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
+
+        instrText.transform.position = GameObject.Find("Disappear").transform.position;
+
+        while (currentTrial <= totalTrials)
+        {
+            ClearStimuli();
+
+            yield return new WaitForSecondsRealtime(preCue_time);
+            GameObject.Find("Cue").transform.position = GameObject.Find("cuePos").transform.position;
+            yield return new WaitForSecondsRealtime(cue_time);
+            GameObject.Find("Cue").transform.position = GameObject.Find("Disappear").transform.position;
+
+            // Show the stimulus pair with delay logic here
+            int delayTime = delay[rnd.Next(delay.Length)];
+            string[] pair;
+
+            switch (rnd.Next(0, 4)) // Choose pair to show
+            {
+                case 0:
+                    pair = new string[] { "snake", "apple" };
+                    break;
+                case 1:
+                    pair = new string[] { "snake", "banana" };
+                    break;
+                case 2:
+                    pair = new string[] { "spider", "apple" };
+                    break;
+                case 3:
+                    pair = new string[] { "spider", "banana" };
+                    break;
+                default:
+                    pair = new string[] { "FAIL", "FAIL" }; // shouldn't happen
+                    break;
+            }
+            string firstPos = pos[rnd.Next(0, 2)]; // Randomly choose between -30 and +30 degrees
+            string secondPos = firstPos == pos[0] ? pos[1] : pos[0]; // Choose other value for second position
+
+            string firstStim = pair[rnd.Next(0, 2)]; // Randomly choose between 1st and 2nd stimuli
+            string secondStim = firstStim == pair[0] ? pair[1] : pair[0]; // Choose other value for second stimuli
+
+            // Show first stimulus
+            logStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            GameObject.Find(firstStim).transform.position = GameObject.Find(firstPos).transform.position;
+
+            // Show second stimulus
+            yield return new WaitForSecondsRealtime(Math.Abs(delayTime) / 1000.0f);
+            GameObject.Find(secondStim).transform.position = GameObject.Find(secondPos).transform.position;
+
+            // Wait for participant's response
+            yield return new WaitUntil(() => Input.GetKeyDown(threatKey) || Input.GetKeyDown(foodKey));
+            long decisionTime = DateTimeOffset.Now.ToUnixTimeMilliseconds() - logStartTime; // Adjust according to your timing logic
+
+            // Log the response
+            string pressedKey = Input.GetKeyDown(threatKey) ? threatKey.ToString() : foodKey.ToString();
+            string correctKey = (firstStim == "snake" || firstStim == "spider") ? threatKey.ToString() : foodKey.ToString();
+            string trialResult = (pressedKey == correctKey || delayTime == 0).ToString();
+            // Columns: DecisionTimeMs,DelayMs,StimType1st,StimType2nd,StimPos1st,StimPos2nd,KeyPressed,Correct
+            string logEntry = $"{decisionTime},{delayTime},{firstStim},{secondStim},{firstPos},{secondPos},{pressedKey},{trialResult}\n"; // Adjust fields as necessary
+            File.AppendAllText(logFile, logEntry);
+            currentTrial++;
+        }
+
+        phase = 5;
+    }
+
+    IEnumerator phase5()
+    {
+        phase *= -1;
+        instrText.GetComponent<TextMeshPro>().text = "Thank you for participating! Please complete the demographics survey.";
+        instrText.transform.position = GameObject.Find("textPos").transform.position;
+        yield return new WaitForSecondsRealtime(5);
+        UnityEditor.EditorApplication.isPlaying = false; // or Application.Quit() for built applications
+    }
+
+    // Method to check if the response is correct
+    private bool CheckResponseCorrectness()
+    {
+        string pressedKey = Input.GetKeyDown(threatKey) ? threatKey.ToString() : foodKey.ToString();
+        bool isThreateningStimulus = (stimuli[stimIndex] == "snake" || stimuli[stimIndex] == "spider");
+        return (isThreateningStimulus && pressedKey == threatKey.ToString()) || (!isThreateningStimulus && pressedKey == foodKey.ToString());
+    }
+
+    // Method to clear stimuli from screen
+    private void ClearStimuli()
+    {
+        foreach (string stimulus in stimuli)
+        {
+            GameObject.Find(stimulus).transform.position = GameObject.Find("Disappear").transform.position;
+        }
+    }
 }
