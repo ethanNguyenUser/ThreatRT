@@ -69,6 +69,14 @@ ThreatRT Experiment/[Bb]uilds/
 ThreatRT Experiment/[Ll]ogs/
 ThreatRT Experiment/[Uu]ser[Ss]ettings/
 
+ThreatRT Experiment Key Change/[Ll]ibrary/
+ThreatRT Experiment Key Change/[Tt]emp/
+ThreatRT Experiment Key Change/[Oo]bj/
+ThreatRT Experiment Key Change/[Bb]uild/
+ThreatRT Experiment Key Change/[Bb]uilds/
+ThreatRT Experiment Key Change/[Ll]ogs/
+ThreatRT Experiment Key Change/[Uu]ser[Ss]ettings/
+
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
 /[Mm]emoryCaptures/
