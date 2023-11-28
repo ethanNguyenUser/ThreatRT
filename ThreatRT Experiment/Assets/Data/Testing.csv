@@ -1,3 +1,0 @@
-DecisionTimeMs,DelayMs,StimType1st,StimType2nd,StimPos1st,StimPos2nd,KeyPressed,Correct
-886,100,apple,snake,deg30,deg-30,H,True
-738,0,apple,spider,deg30,deg-30,H,True

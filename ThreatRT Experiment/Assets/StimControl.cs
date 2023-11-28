@@ -82,7 +82,7 @@ public class StimControl : MonoBehaviour
     // Initialize variables with Start() to avoid requirement to reset the script in Unity everytime a value is changed
     void Start()
     {
-        pos = new string[] { "deg30", "deg-30" }; // different random positions available (Unity object names)
+        pos = new string[] { "deg15", "deg-15" }; // different random positions available (Unity object names)
         delay = new int[] { 0, 25, 50, 100 };
         stimuli = new string[] { "snake", "spider", "apple", "banana" }; // names of different stimuli
 
@@ -347,6 +347,7 @@ public class StimControl : MonoBehaviour
 
         instrText.transform.position = GameObject.Find("Disappear").transform.position;
 
+        currentTrial = 1;
         while (currentTrial <= totalTrials)
         {
             ClearStimuli();
@@ -378,7 +379,7 @@ public class StimControl : MonoBehaviour
                     pair = new string[] { "FAIL", "FAIL" }; // shouldn't happen
                     break;
             }
-            string firstPos = pos[rnd.Next(0, 2)]; // Randomly choose between -30 and +30 degrees
+            string firstPos = pos[rnd.Next(0, 2)]; // Randomly choose between -15 and +15 degrees
             string secondPos = firstPos == pos[0] ? pos[1] : pos[0]; // Choose other value for second position
 
             string firstStim = pair[rnd.Next(0, 2)]; // Randomly choose between 1st and 2nd stimuli
