@@ -83,7 +83,8 @@ public class StimControl : MonoBehaviour
     void Start()
     {
         pos = new string[] { "deg15", "deg-15" }; // different random positions available (Unity object names)
-        delay = new int[] { 0, 25, 50, 100 };
+        //delay = new int[] {200 };
+        delay = new int[] { 0, 25, 25, 50, 50, 100, 100 };
         stimuli = new string[] { "snake", "spider", "apple", "banana" }; // names of different stimuli
 
         // self explanatory
@@ -116,7 +117,7 @@ public class StimControl : MonoBehaviour
         // counter for finishing the program
         currentTrial = 1;
         trainingTrials = 20;
-        totalTrials = 140;
+        totalTrials = 196;
 
         // global variables for time
         preCue_time = (float)0.5; // wait time before cue is shown after trial ends
@@ -273,7 +274,7 @@ public class StimControl : MonoBehaviour
         {
             instrText.GetComponent<TextMeshPro>().text = instrTextValues[instrNum];
             instrText.transform.position = GameObject.Find("Disappear").transform.position;
-            phase = 2;
+            phase = 4;
         }
     }
     //// Training Phase
