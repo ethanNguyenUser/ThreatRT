@@ -91,10 +91,8 @@ public class StimControl : MonoBehaviour
             // instruction 0
             @"You will be reacting to four different stimuli in this protocol:
             snake, spider, apple, and banana. 
-            To react, you will be pressing the keys
-            G, for the snake and spider 
-            H, for the apple and banana
             Please try to react to the stimuli and don't try to anticipate them.
+            You will be shown what these stimuli look like now
             Press Spacebar when ready.",
         // instruction 1
         @"This is a snake. Press Spacebar to continue.",
