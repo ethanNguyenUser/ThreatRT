@@ -117,7 +117,7 @@ public class StimControl : MonoBehaviour
         // counter for finishing the program
         currentTrial = 1;
         trainingTrials = 20;
-        totalTrials = 196;
+        totalTrials = 196 * 2;
 
         // global variables for time
         preCue_time = (float)0.5; // wait time before cue is shown after trial ends
@@ -350,7 +350,7 @@ public class StimControl : MonoBehaviour
             yield return new WaitForSecondsRealtime(preCue_time);
             GameObject.Find("Cue").transform.position = GameObject.Find("cuePos").transform.position;
             yield return new WaitForSecondsRealtime(cue_time);
-            GameObject.Find("Cue").transform.position = GameObject.Find("Disappear").transform.position;
+            //GameObject.Find("Cue").transform.position = GameObject.Find("Disappear").transform.position;
 
             // Show the stimulus pair with delay logic here
             int delayTime = delay[rnd.Next(delay.Length)];
