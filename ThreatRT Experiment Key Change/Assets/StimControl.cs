@@ -82,7 +82,7 @@ public class StimControl : MonoBehaviour
     // Initialize variables with Start() to avoid requirement to reset the script in Unity everytime a value is changed
     void Start()
     {
-        pos = new string[] { "deg15", "deg-15" }; // different random positions available (Unity object names)
+        pos = new string[] { "deg-15", "deg15" }; // different random positions available (Unity object names)
         //delay = new int[] {200 };
         delay = new int[] { 0, 25, 25, 50, 50, 100, 100 };
         stimuli = new string[] { "snake", "spider", "apple", "banana" }; // names of different stimuli
