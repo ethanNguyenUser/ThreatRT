@@ -84,7 +84,7 @@ public class StimControl : MonoBehaviour
     {
         pos = new string[] { "deg-15", "deg15" }; // different random positions available (Unity object names)
         //delay = new int[] {200 };
-        delay = new int[] { 0, 25, 25, 50, 50, 100, 100 };
+        delay = new int[] { 300 };
         stimuli = new string[] { "snake", "spider", "apple", "banana" }; // names of different stimuli
 
         // self explanatory
@@ -117,7 +117,7 @@ public class StimControl : MonoBehaviour
         // counter for finishing the program
         currentTrial = 1;
         trainingTrials = 20;
-        totalTrials = 196 * 2;
+        totalTrials = 30;
 
         // global variables for time
         preCue_time = (float)0.5; // wait time before cue is shown after trial ends
